@@ -27,8 +27,7 @@ def link_records(anon, aux):
             unique_matches[key] = name
 
     # map predicted names
-    anon["predicted_name"] = anon["key"].map(unique_matches)
-
+    anon["matched_name"] = anon["key"].map(unique_matches)
     return anon
 
 
@@ -36,7 +35,7 @@ def deanonymization_rate(matches, anon):
 
     total_records = len(anon)
 
-    matched_records = matches["predicted_name"].notna().sum()
+    matched_records = matches["matched_name"].notna().sum()
 
     rate = matched_records / total_records
 
