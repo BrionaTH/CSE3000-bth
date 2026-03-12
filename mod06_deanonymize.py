@@ -2,41 +2,38 @@ import pandas as pd
 
 
 def load_data(anon_path, aux_path):
-    # Load both datasets
+
     anon = pd.read_csv(anon_path)
     aux = pd.read_csv(aux_path)
-
     return anon, aux
 
 
 def link_records(anon, aux):
 
-    # create a matching key
+    #create a matching key
     anon["key"] = list(zip(anon["age"], anon["gender"], anon["zip3"]))
     aux["key"] = list(zip(aux["age"], aux["gender"], aux["zip3"]))
 
-    # count occurrences in auxiliary dataset
-    key_counts = aux["key"].value_counts()
+    #merge datasets on key
+    merged = pd.merge(anon, aux[["key", "name"]], on="key", how="left")
 
-    # store unique matches
-    unique_matches = {}
+    key_counts = merged["key"].value_counts()
 
-    for key, count in key_counts.items():
-        if count == 1:
-            name = aux[aux["key"] == key]["name"].iloc[0]
-            unique_matches[key] = name
+    unique_keys = key_counts[key_counts == 1].index
 
-    # map predicted names
-    anon["matched_name"] = anon["key"].map(unique_matches)
-    return anon
+    merged["matched_name"] = merged.apply(
+        lambda row: row["name"] if row["key"] in unique_keys else pd.NA, axis=1
+    )
+
+    #drop helper columns
+    merged = merged.drop(columns=["key", "name"])
+
+    return merged
 
 
 def deanonymization_rate(matches, anon):
 
     total_records = len(anon)
-
     matched_records = matches["matched_name"].notna().sum()
-
     rate = matched_records / total_records
-
     return rate
