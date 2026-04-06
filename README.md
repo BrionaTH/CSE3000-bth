@@ -1,6 +1,6 @@
 # CSE3000-bth
 
-## Personal Statement on Ethical AI
+## Personal Statement
 
 I, Briona Hall, a student at the University of Connecticut, am committed to contributing to the development of AI technologies that are trustworthy, respectful, and beneficial to society.
 
